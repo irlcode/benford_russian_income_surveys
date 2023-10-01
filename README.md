@@ -19,7 +19,7 @@ user:~$ echo 'BENFORD_RUSSIAN_INCOME_SURVEYS_PATH="path_to_cloned_repository"' >
 |    ├── 2b_within_rlms_conformity.r                    # Test RLMS conformity within SSU/new/old respondents
 |    ├── 3_produce_plots_and_tables.r                   # Produce all Figures and Tables in the paper
 |    ├── helper_functions/
-|    |   ├── 3_produce_plots_and_tables.r               # Install dependencies
+|    |   ├── install_dependencies.r                     # Install dependencies
 |    |   └── helper_functions.r                         # Functions performing all statistical tests
 |    └──prepare_surveys/                                # Code to prepare survey data
 |       ├── 1a_convert_rlms.r                           # HSE's Russian longitudinal monitoring survey
@@ -51,7 +51,7 @@ user:~$ echo 'BENFORD_RUSSIAN_INCOME_SURVEYS_PATH="path_to_cloned_repository"' >
 |    ├── individual_survey_conformity.csv               # Table 3, individual-level
 |    ├── recent_income_surveys_summary_stat.csv         # Table A.1
 |    └── rlms_household_conformers_per_area_id_year.csv # Table A.2
-├── figures/                                             
+└── figures/                                             
      ├── digit_probs_plot.pdf                           # Figure 1
      ├── rlms_conformity_plot.pdf                       # Figure 2
      ├── conformity_novelty_plot.pdf                    # Figure 3
