@@ -47,17 +47,17 @@ compute_first_digit_distrib <- function(values) {
 	values <- values[!is.infinite(values)]
 	
 	# Extract first significant digits
-    x <- extract_digits(values, check = "first", include.zero = FALSE)
-    x <- x[!is.na(x)]
-    n <- length(x)
-    
-    # Observed counts of first significant digits
-    x_tab <- table(x)
-    dig <- 1:9
-    x <- rep(0, length(dig))
-    x_included <- as.numeric(names(x_tab))
-    index <- x_included
-    x[index] <- as.numeric(x_tab)
+	x <- extract_digits(values, check = "first", include.zero = FALSE)
+	x <- x[!is.na(x)]
+	n <- length(x)
+	
+	# Observed counts of first significant digits
+	x_tab <- table(x)
+	dig <- 1:9
+	x <- rep(0, length(dig))
+	x_included <- as.numeric(names(x_tab))
+	index <- x_included
+	x[index] <- as.numeric(x_tab)
 
 	# Proportions
 	x_prop <- data.table(digit = 1:9, prop = x/sum(x))

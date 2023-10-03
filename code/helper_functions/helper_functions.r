@@ -146,18 +146,18 @@ test_conformity <- function(values, bayesian = TRUE) {
 	values <- values[ values != 0]
 
 	# Extract first significant digits
-    x <- extract_digits(values, check = "first", include.zero = FALSE)
-    x <- x[!is.na(x)]
-    n <- length(x)
-    
-    # Observed counts of first significant digits
-    x_tab <- table(x)
-    dig <- 1:9
-    x <- rep(0, length(dig))
-    x_included <- as.numeric(names(x_tab))
-    index <- x_included
-    x[index] <- as.numeric(x_tab)
-    
+	x <- extract_digits(values, check = "first", include.zero = FALSE)
+	x <- x[!is.na(x)]
+	n <- length(x)
+	
+	# Observed counts of first significant digits
+	x_tab <- table(x)
+	dig <- 1:9
+	x <- rep(0, length(dig))
+	x_included <- as.numeric(names(x_tab))
+	index <- x_included
+	x[index] <- as.numeric(x_tab)
+	
 	# Various counts for debugging
 	# x <- c(231, 124, 97, 70, 64, 54, 40, 54, 38) # Sino Forest (https://psyarxiv.com/kzqp5)
 	# x <- c(509, 353, 177, 114, 77, 77, 53, 73, 64) # Greek Fiscal (multibridge, https://doi.org/10.3758/s13428-022-02020-1)
@@ -288,10 +288,10 @@ test_conformity <- function(values, bayesian = TRUE) {
 			# Benford's law	
 			# Pearson χ statistic (Pearson, 1900) as well as 
 			# goodness-of-fit tests: Anderson-Darling's A statistic, Cramér-von Mises' W statistic, Watson' U statistic (Watson, 1961)
-	    	temp <- groupFit(counts = x, distr = "user", pfixed = pr_benford, imhof = FALSE, pave = TRUE)
-	    	
-	    	benford_chisq <- temp$stats["Chi-squared","test_statistics"]
-	    	benford_chisqpval <- temp$pvals["Chi-squared","pvals"]
+			temp <- groupFit(counts = x, distr = "user", pfixed = pr_benford, imhof = FALSE, pave = TRUE)
+			
+			benford_chisq <- temp$stats["Chi-squared","test_statistics"]
+			benford_chisqpval <- temp$pvals["Chi-squared","pvals"]
 			benford_asq <- temp$stats["A-squared","test_statistics"]
 			benford_asqpval <- temp$pvals["A-squared","pvals"]
 			benford_wsq <- temp$stats["W-squared","test_statistics"]
@@ -303,9 +303,9 @@ test_conformity <- function(values, bayesian = TRUE) {
 			
 			# Stigler's law
 			temp <- groupFit(counts = x, distr = "user", pfixed = pr_stigler, imhof = FALSE, pave = TRUE)
-	    	
-	    	stigler_chisq <- temp$stats["Chi-squared","test_statistics"]
-	    	stigler_chisqpval <- temp$pvals["Chi-squared","pvals"]
+
+			stigler_chisq <- temp$stats["Chi-squared","test_statistics"]
+			stigler_chisqpval <- temp$pvals["Chi-squared","pvals"]
 			stigler_asq <- temp$stats["A-squared","test_statistics"]
 			stigler_asqpval <- temp$pvals["A-squared","pvals"]
 			stigler_wsq <- temp$stats["W-squared","test_statistics"]
@@ -317,9 +317,9 @@ test_conformity <- function(values, bayesian = TRUE) {
 			
 			# Uniform distribution
 			temp <- groupFit(counts = x, distr = "user", pfixed = pr_uniform, imhof = FALSE, pave = TRUE)
-	    	
-	    	uniform_chisq <- temp$stats["Chi-squared","test_statistics"]
-	    	uniform_chisqpval <- temp$pvals["Chi-squared","pvals"]
+
+			uniform_chisq <- temp$stats["Chi-squared","test_statistics"]
+			uniform_chisqpval <- temp$pvals["Chi-squared","pvals"]
 			uniform_asq <- temp$stats["A-squared","test_statistics"]
 			uniform_asqpval <- temp$pvals["A-squared","pvals"]
 			uniform_wsq <- temp$stats["W-squared","test_statistics"]
@@ -331,9 +331,9 @@ test_conformity <- function(values, bayesian = TRUE) {
 			
 			# Contaminated Benford
 			temp <- groupFit(counts = x, distr = "user", pfixed = pr_contaminated_benford, imhof = FALSE, pave = TRUE)
-	    	
-	    	contaminated_benford_chisq <- temp$stats["Chi-squared","test_statistics"]
-	    	contaminated_benford_chisqpval <- temp$pvals["Chi-squared","pvals"]
+			
+			contaminated_benford_chisq <- temp$stats["Chi-squared","test_statistics"]
+			contaminated_benford_chisqpval <- temp$pvals["Chi-squared","pvals"]
 			contaminated_benford_asq <- temp$stats["A-squared","test_statistics"]
 			contaminated_benford_asqpval <- temp$pvals["A-squared","pvals"]
 			contaminated_benford_wsq <- temp$stats["W-squared","test_statistics"]
@@ -345,9 +345,9 @@ test_conformity <- function(values, bayesian = TRUE) {
 			
 			# Generalized benford's law
 			temp <- groupFit(counts = x, distr = "user", pfixed = pr_generalized_benford, imhof = FALSE, pave = TRUE)
-	    	
-	    	generalized_benford_chisq <- temp$stats["Chi-squared","test_statistics"]
-	    	generalized_benford_chisqpval <- temp$pvals["Chi-squared","pvals"]
+			
+			generalized_benford_chisq <- temp$stats["Chi-squared","test_statistics"]
+			generalized_benford_chisqpval <- temp$pvals["Chi-squared","pvals"]
 			generalized_benford_asq <- temp$stats["A-squared","test_statistics"]
 			generalized_benford_asqpval <- temp$pvals["A-squared","pvals"]
 			generalized_benford_wsq <- temp$stats["W-squared","test_statistics"]
@@ -359,9 +359,9 @@ test_conformity <- function(values, bayesian = TRUE) {
 			
 			# Rodriguez distribution
 			temp <- groupFit(counts = x, distr = "user", pfixed = pr_rodriguez, imhof = FALSE, pave = TRUE)
-	    	
-	    	rodriguez_chisq <- temp$stats["Chi-squared","test_statistics"]
-	    	rodriguez_chisqpval <- temp$pvals["Chi-squared","pvals"]
+			
+			rodriguez_chisq <- temp$stats["Chi-squared","test_statistics"]
+			rodriguez_chisqpval <- temp$pvals["Chi-squared","pvals"]
 			rodriguez_asq <- temp$stats["A-squared","test_statistics"]
 			rodriguez_asqpval <- temp$pvals["A-squared","pvals"]
 			rodriguez_wsq <- temp$stats["W-squared","test_statistics"]
@@ -373,9 +373,9 @@ test_conformity <- function(values, bayesian = TRUE) {
 			
 			# Hurlimann's distribution
 			temp <- groupFit(counts = x, distr = "user", pfixed = pr_hurlimann, imhof = FALSE, pave = TRUE)
-	    	
-	    	hurlimann_chisq <- temp$stats["Chi-squared","test_statistics"]
-	    	hurlimann_chisqpval <- temp$pvals["Chi-squared","pvals"]
+			
+			hurlimann_chisq <- temp$stats["Chi-squared","test_statistics"]
+			hurlimann_chisqpval <- temp$pvals["Chi-squared","pvals"]
 			hurlimann_asq <- temp$stats["A-squared","test_statistics"]
 			hurlimann_asqpval <- temp$pvals["A-squared","pvals"]
 			hurlimann_wsq <- temp$stats["W-squared","test_statistics"]
