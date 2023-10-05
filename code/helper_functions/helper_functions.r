@@ -343,7 +343,7 @@ test_conformity <- function(values, bayesian = TRUE) {
 			
 			rm(temp)
 			
-			# Generalized benford's law
+			# Generalized Benford's law
 			temp <- groupFit(counts = x, distr = "user", pfixed = pr_generalized_benford, imhof = FALSE, pave = TRUE)
 			
 			generalized_benford_chisq <- temp$stats["Chi-squared","test_statistics"]
