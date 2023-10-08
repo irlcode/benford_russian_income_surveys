@@ -17,6 +17,7 @@ user:~$ echo 'BENFORD_RUSSIAN_INCOME_SURVEYS_PATH="path_to_cloned_repository"' >
 |    ├── 1_summary_stat_income_surveys.r                # Summary statistics and first-digit distributions
 |    ├── 2a_test_conformity_all_surveys.r               # Test all surveys' conformity to Benford's law
 |    ├── 2b_within_rlms_conformity.r                    # Test RLMS conformity within SSU/new/old respondents
+|    ├── 2c_power_simulations.r                         # Conduct power simulations of Benford tests
 |    ├── 3_produce_plots_and_tables.r                   # Produce all Figures and Tables in the paper
 |    ├── helper_functions/
 |    |   ├── install_dependencies.r                     # Install dependencies
@@ -56,10 +57,8 @@ user:~$ echo 'BENFORD_RUSSIAN_INCOME_SURVEYS_PATH="path_to_cloned_repository"' >
      ├── rlms_conformity_plot.pdf                       # Figure 2
      ├── conformity_novelty_plot.pdf                    # Figure 3
      ├── yearly_survey_mentions_top_journals_plot.pdf   # Figure A.1
+     ├── benford_power_simulations_plot.pdf             # Figure A.2
      └── rlms_ssu_share_plot.pdf                        # Figure A.2
-
-
-
 ```
 
 ## Data availability statement

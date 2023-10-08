@@ -40,6 +40,9 @@ load("output/rlms_household_income_conformity_by_area_id_year.rdata")
 load("output/rlms_household_income_conformity_by_novelty.rdata")
 load("output/vodpf_household_income_conformity_by_novelty.rdata")
 
+# Load results of power simulations computed by 2c_power_simulations.r
+load("output/benford_power_simulations.rdata")
+
 #############################
 # Figure showcasing various distributions under their parameters
 
@@ -291,7 +294,7 @@ sum(unique(top_papers, by = "elibrary_id")$cited) # 193
 # Yearly counts of mentions per survey-journal
 yearly_survey_mentions_top_journals <- top_papers[, .N, by = c("journal", "survey", "year")]
 
-yearly_survey_mentions_top_journals_plot <- ggplot(aes(x = year, y = N, fill = survey, colour = survey, shape = survey, grou), data = yearly_survey_mentions_top_journals) +
+yearly_survey_mentions_top_journals_plot <- ggplot(aes(x = year, y = N, fill = survey, colour = survey, shape = survey), data = yearly_survey_mentions_top_journals) +
 	geom_line() +
 	geom_point() +
 	labs(x = "", y = "Статей") +
@@ -302,6 +305,29 @@ yearly_survey_mentions_top_journals_plot <- ggplot(aes(x = year, y = N, fill = s
 
 ggsave(yearly_survey_mentions_top_journals_plot, file = "figures/yearly_survey_mentions_top_journals_plot.pdf", width = 710, height = 860, scale = 3, device = cairo_pdf, units = "px")
 
+#############################
+# Figure with results of power simulations
+
+benford_power_simulations[ alternative == "Contaminated Benford", alternative := "А. «Загрязненный» закон Бенфорда"]
+benford_power_simulations[ alternative == "Generalized Benford", alternative := "Б. Обобщенный закон Бенфорда"]
+benford_power_simulations[ alternative == "Rodriguez", alternative := "В. Закон Родригеза"]
+benford_power_simulations[ alternative == "Hurlimann", alternative := "Г. Закон Хюрлимана"]
+
+benford_power_simulations[ test == "chisqpval", test := "Пирсон"]
+benford_power_simulations[ test == "asqpval", test := "Андерсон-Дарлинг"]
+benford_power_simulations[ test == "wsqpval", test := "Крамер-Мизес-Смирнов"]
+benford_power_simulations[ test == "usqpval", test := "Ватсон"]
+
+benford_power_simulations_plot <- ggplot(aes(x = param, y = power, fill = test, colour = test, shape = test), data = benford_power_simulations) +
+	geom_line() +
+	geom_point() +
+	labs(x = "параметр закона", y = "Статистическая мощность") +
+	scale_x_continuous(breaks = scales::pretty_breaks(n = 10), guide = guide_axis(n.dodge = 2)) +
+	theme_minimal() +
+	facet_wrap(.~alternative, scales = "free_x", nrow = 3) +
+	theme(text = element_text(size = 12), legend.position = "bottom", legend.title = element_blank(), panel.grid.minor = element_blank(), panel.grid.major = element_blank())
+
+ggsave(benford_power_simulations_plot, file = "figures/benford_power_simulations_plot.pdf", width = 710, height = 860, scale = 3, device = cairo_pdf, units = "px")
 
 #############################
 # Summary statistics table (recent waves)
