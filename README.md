@@ -58,7 +58,7 @@ user:~$ echo 'BENFORD_RUSSIAN_INCOME_SURVEYS_PATH="path_to_cloned_repository"' >
      ├── conformity_novelty_plot.pdf                    # Figure 3
      ├── yearly_survey_mentions_top_journals_plot.pdf   # Figure A.1
      ├── benford_power_simulations_plot.pdf             # Figure A.2
-     └── rlms_ssu_share_plot.pdf                        # Figure A.2
+     └── rlms_ssu_share_plot.pdf                        # Figure A.3
 ```
 
 ## Data availability statement
