@@ -1,5 +1,5 @@
 survey,year,level,type,benford,stigler,uniform,contaminated_benford,generalized_benford,rodriguez,hurlimann
-VODPF,2022,household,posterior,0,0.3953,0,0,0,0.4848,0
+VODPF,2022,household,posterior,0,0.761,0,0,0,0.8216,0
 VODPF,2022,individual,posterior,0,0,0,0,0,0,0
 VNDN,2022,household,posterior,0,0,0,0,0,0,0
 VNDN,2022,individual,posterior,0,0,0,0,0,0,0
@@ -8,7 +8,7 @@ SIPP,2022,individual,posterior,0,0,0,0,0,0,0
 RLMS,2022,household,posterior,0,0,0,0,0,0,0
 RLMS,2022,individual,posterior,0,0,0,0,0,0,0
 RCVS,2021,household,posterior,0,0,0,0,0,0,0
-FINMON,2018,household,posterior,0,0.9382,0,0,0,0.9776,0
+FINMON,2018,household,posterior,0,0.9984,0,0,0,0.9998,0
 EUSILC,2013,household,posterior,0,0,0,0,0,0,0
 EUSILC,2013,individual,posterior,0,0,0,0,0,0,0
 VODPF,2022,household,pvalue,0,0,0,0,0,0,0

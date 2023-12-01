@@ -239,8 +239,9 @@ rlms_conformity[ distribution == "hurlimann", distribution := "Закон Хюр
 
 rlms_conformity_plot <- ggplot(aes(x = year, y = posterior, group = distribution, fill = distribution, colour = distribution, shape = distribution), data = rlms_conformity[posterior > 0.6]) +
 	geom_vline(aes(xintercept=2010), color = "grey") +
-	geom_text(aes(x = 2010.1, y = 0.75, label = "ВШЭ становится\nадминистрирующей\nорганизацией"), color = "black", size = 4, hjust = 0) + 
-	geom_line() + 
+	geom_text(aes(x = 2010.1, y = 0.85, label = "ВШЭ становится\nадминистрирующей\nорганизацией"), color = "black", size = 4, hjust = 0) + 
+	geom_line(alpha = 0.5, linewidth = 2) + 
+	geom_point(alpha = 0.5) + 
 	scale_x_continuous(breaks = scales::pretty_breaks(n = 20)) +
 	labs(x = "Год волны опроса РМЭЗ", y = "Апостер. вероятн. соответств. закону") + 
 	theme_minimal() +
@@ -395,7 +396,7 @@ mean(rlms_household_income_conformity_by_area_id_year[area_id == 72 & type == "p
 
 
 #############################
-# Figure with RLMS share of SSU observations conforming to Benford's law
+# Figure with RLMS share of SSU observations conforming with Benford's law
 
 rlms_household_income_conformity_by_area_id_year <- rlms_household_income_conformity_by_area_id_year[ type == "posterior" ]
 

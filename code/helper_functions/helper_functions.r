@@ -266,8 +266,8 @@ test_conformity <- function(values, bayesian = TRUE) {
 			## Log Bayes factors
 			bf_row <- data.table(type = "log10BF01", benford = log10(BF01_benford), stigler = log10(BF01_stigler), uniform = log10(BF01_uniform), contaminated_benford = log10(BF01_contaminated_benford), generalized_benford = log10(BF01_generalized_benford), rodriguez = log10(BF01_rodriguez), hurlimann = log10(BF01_hurlimann))
 			## Posterior probabilities
-			posterior_row <- data.table(type = "posterior", bf_row[, lapply(.SD, function(x)  1 - 1/exp(x)), .SDcols = c("benford", "stigler", "uniform", "contaminated_benford", "generalized_benford", "rodriguez", "hurlimann")])
-			
+			posterior_row <- data.table(type = "posterior", bf_row[, lapply(.SD, function(x) (10^x)/((10^x) + 1)), .SDcols = c("benford", "stigler", "uniform", "contaminated_benford", "generalized_benford", "rodriguez", "hurlimann")])
+
 			out <- rbindlist(list(posterior_row, bf_row, optimal_row), fill = T)
 
 		} else {
