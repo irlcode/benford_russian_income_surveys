@@ -79,4 +79,5 @@ income_surveys_income_conformity_frequentist[type %in% c("stat"), c(vars_convert
 # Proper order
 setorderv(income_surveys_income_conformity_frequentist, c("survey", "year", "level", "type"), c(-1, -1, 1, 1))
 
+# Save point
 save(income_surveys_income_conformity_frequentist, file = "output/income_surveys_income_conformity_frequentist.rdata", compress = "gzip")

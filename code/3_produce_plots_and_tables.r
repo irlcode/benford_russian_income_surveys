@@ -43,18 +43,24 @@ load("output/vodpf_household_income_conformity_by_novelty.rdata")
 # Load results of power simulations computed by 2c_power_simulations.r
 load("output/benford_power_simulations.rdata")
 
+# Load results of per-wave RLMS characteristics by 2c_rlms_ssu_conformity.r
+rlms_per_wave_characteristics <- fread("output/rlms_per_wave_characteristics.csv")
+
+# Load results of RLMS structural break tests by 2c_rlms_ssu_conformity.r
+rlms_structural_breaks <- fread("output/rlms_structural_breaks.csv")
+
 #############################
 # Figure showcasing various distributions under their parameters
 
 # Optimal parameters of distributions at 0th, 25th, 50th, 75th, and 100th percentiles
 # in the data
-epsilons <- unname(quantile(income_surveys_income_conformity[type == "optim"]$contaminated_benford))
+epsilons <- unname(quantile(income_surveys_income_conformity[type == "optim" & survey != "RLMSrepr"]$contaminated_benford))
 # Manually replace second item to avoid ties due to duplicates
 epsilons[2] <- 0.00001
 
-alphas <- unname(quantile(income_surveys_income_conformity[type == "optim"]$generalized_benford))
-betas <- unname(quantile(income_surveys_income_conformity[type == "optim"]$rodriguez)) # betas <- -1
-gammas <- unname(quantile(income_surveys_income_conformity[type == "optim"]$hurlimann))
+alphas <- unname(quantile(income_surveys_income_conformity[type == "optim" & survey != "RLMSrepr"]$generalized_benford))
+betas <- unname(quantile(income_surveys_income_conformity[type == "optim" & survey != "RLMSrepr"]$rodriguez)) # betas <- -1
+gammas <- unname(quantile(income_surveys_income_conformity[type == "optim" & survey != "RLMSrepr"]$hurlimann))
 
 # To one object
 digit_probs <- data.table(distribution = "benford", param = 1, paramgroup = 1, digit = 1:9, probability = prob.genbenford(alpha = 1))
@@ -139,7 +145,6 @@ digit_probs_plot <- do.call(grid.arrange, c(digit_probs_plot_func, ncol = 3))
 
 ggsave(digit_probs_plot, file = "figures/digit_probs_plot.pdf", width = 710, height = 430, scale = 3, device = cairo_pdf, units = "px")
 
-
 #############################
 # First digit distribution table (recent waves)
 
@@ -147,25 +152,26 @@ ggsave(digit_probs_plot, file = "figures/digit_probs_plot.pdf", width = 710, hei
 income_surveys_digit_distrib <- fread("output/income_surveys_digit_distrib.csv")
 
 # Only most recent surveys and waves
-recent_income_surveys_digit_distrib <- income_surveys_digit_distrib[ (survey %in% c("VNDN", "VODPF", "RLMS", "SIPP") & year == 2022) | (survey == "RCVS" & year == 2021) | (survey == "FINMON" & year == 2018) | (survey == "EUSILC" & year == 2013)]
+recent_income_surveys_digit_distrib <- income_surveys_digit_distrib[ (survey %in% c("VNDN", "VODPF", "RLMS", "RLMSrepr", "SIPP") & year == 2022) | (survey == "RCVS" & year == 2021) | (survey == "FINMON" & year == 2018) | (survey == "EUSILC" & year == 2013)]
 recent_income_surveys_digit_distrib[ level == "household", level := "Дом-ва"]
 recent_income_surveys_digit_distrib[ level == "individual", level := "Инд."]
 
 recent_income_surveys_digit_distrib[ survey == "VNDN", survey := "ВНДН"]
 recent_income_surveys_digit_distrib[ survey == "VODPF", survey := "ВОДПФ"]
-recent_income_surveys_digit_distrib[ survey == "RLMS", survey := "РМЭЗ"]
+recent_income_surveys_digit_distrib[ survey == "RLMS", survey := "РМЭЗ (полн)"]
+recent_income_surveys_digit_distrib[ survey == "RLMSrepr", survey := "РМЭЗ (репр)"]
 recent_income_surveys_digit_distrib[ survey == "FINMON", survey := "ФИНМОН"]
 
 # Custom order
-recent_income_surveys_digit_distrib <- recent_income_surveys_digit_distrib[c(3, 4, 1, 2, 7, 8, 10, 9, 5, 6, 11, 12)]
+recent_income_surveys_digit_distrib <- recent_income_surveys_digit_distrib[c(3, 4, 1, 2, 9, 10, 7, 8, 12, 11, 5, 6, 13, 14)]
 fwrite(recent_income_surveys_digit_distrib, file = "tables/recent_income_surveys_digit_distrib.csv", scipen = 999)
 
 #############################
 # Watson statistic, p-value and posterior digit distribution table (recent waves)
 
-recent_income_surveys_conformity_bayesian <- income_surveys_income_conformity[((survey %in% c("VNDN", "VODPF", "RLMS", "SIPP") & year == 2022) | (survey == "RCVS" & year == 2021) | (survey == "FINMON" & year == 2018) | (survey == "EUSILC" & year == 2013) )& type == "posterior"]
+recent_income_surveys_conformity_bayesian <- income_surveys_income_conformity[((survey %in% c("VNDN", "VODPF", "RLMS", "RLMSrepr", "SIPP") & year == 2022) | (survey == "RCVS" & year == 2021) | (survey == "FINMON" & year == 2018) | (survey == "EUSILC" & year == 2013) )& type == "posterior"]
 
-recent_income_surveys_conformity_frequentist <- income_surveys_income_conformity_frequentist[((survey %in% c("VNDN", "VODPF", "RLMS", "SIPP") & year == 2022) | (survey == "RCVS" & year == 2021) | (survey == "FINMON" & year == 2018) | (survey == "EUSILC" & year == 2013) ) & type %in% c("pvalue"), c("survey", "year", "level", "type", names(income_surveys_income_conformity_frequentist)[grepl("usq", names(income_surveys_income_conformity_frequentist))]), with = F]
+recent_income_surveys_conformity_frequentist <- income_surveys_income_conformity_frequentist[((survey %in% c("VNDN", "VODPF", "RLMS", "RLMSrepr", "SIPP") & year == 2022) | (survey == "RCVS" & year == 2021) | (survey == "FINMON" & year == 2018) | (survey == "EUSILC" & year == 2013) ) & type %in% c("pvalue"), c("survey", "year", "level", "type", names(income_surveys_income_conformity_frequentist)[grepl("usq", names(income_surveys_income_conformity_frequentist))]), with = F]
 names(recent_income_surveys_conformity_frequentist) <- gsub("_usq", "", names(recent_income_surveys_conformity_frequentist))
 
 recent_income_surveys_conformity <- rbind(recent_income_surveys_conformity_bayesian, recent_income_surveys_conformity_frequentist, fill = T)
@@ -188,7 +194,6 @@ household_survey_conformity_bayesian <- income_surveys_income_conformity[type ==
 , by = "survey" ]
 
 household_survey_conformity_bayesian[, approach := "байез."]
-
 
 # Frequentist
 ## Only p-value from U-stat
@@ -214,12 +219,13 @@ setorderv(household_survey_conformity, c("survey", "approach"), c(1, -1))
 setcolorder(household_survey_conformity, c("survey", "approach"))
 
 # Proper order
-household_survey_conformity <- household_survey_conformity[c(11, 12, 13, 14, 7, 8, 3, 4, 5, 6, 9, 10, 1, 2)]
+household_survey_conformity <- household_survey_conformity[c(13, 14, 15, 16, 7, 8, 9, 10, 3, 4, 5, 6, 11, 12, 1, 2)]
 
 # Proper survey names
 household_survey_conformity[ survey == "VNDN", survey := "ВНДН"]
 household_survey_conformity[ survey == "VODPF", survey := "ВОДПФ"]
-household_survey_conformity[ survey == "RLMS", survey := "РМЭЗ"]
+household_survey_conformity[ survey == "RLMS", survey := "РМЭЗ (полн)"]
+household_survey_conformity[ survey == "RLMSrepr", survey := "РМЭЗ (репр)"]
 household_survey_conformity[ survey == "FINMON", survey := "ФИНМОН"]
 
 fwrite(household_survey_conformity, file = "tables/household_survey_conformity.csv")
@@ -237,12 +243,13 @@ rlms_conformity[ distribution == "generalized_benford", distribution := "Обо�
 rlms_conformity[ distribution == "rodriguez", distribution := "Закон Родригеза"]
 rlms_conformity[ distribution == "hurlimann", distribution := "Закон Хюрлимана"]
 
-rlms_conformity_plot <- ggplot(aes(x = year, y = posterior, group = distribution, fill = distribution, colour = distribution, shape = distribution), data = rlms_conformity[posterior > 0.6]) +
+rlms_conformity_plot <- ggplot(aes(x = year, y = posterior, group = distribution, fill = distribution, colour = distribution, shape = distribution), data = rlms_conformity) +
 	geom_vline(aes(xintercept=2010), color = "grey") +
 	geom_text(aes(x = 2010.1, y = 0.85, label = "ВШЭ становится\nадминистрирующей\nорганизацией"), color = "black", size = 4, hjust = 0) + 
 	geom_line(alpha = 0.5, linewidth = 2) + 
 	geom_point(alpha = 0.5) + 
-	scale_x_continuous(breaks = scales::pretty_breaks(n = 20)) +
+	scale_x_continuous(breaks = sort(unique(rlms_conformity$year)), guide = guide_axis(n.dodge = 2)) +
+	scale_y_continuous(limits = c(0.82, 1), breaks = scales::pretty_breaks(10)) +
 	labs(x = "Год волны опроса РМЭЗ", y = "Апостер. вероятн. соответств. закону") + 
 	theme_minimal() +
 	theme(text = element_text(size = 12), legend.position = "bottom", , legend.title = element_blank(), panel.grid.minor = element_blank(), panel.grid.major = element_blank())
@@ -255,7 +262,7 @@ ggsave(rlms_conformity_plot, file = "figures/rlms_conformity_plot.pdf", width = 
 
 rlms_conformity_novelty <- rlms_household_income_conformity_by_novelty[type == "posterior", -c("type", "uniform", "benford", "stigler", "contaminated_benford", "rodriguez", "hurlimann")]
 rlms_conformity_novelty <- melt(rlms_conformity_novelty, id.vars = c("year", "new"), variable.name = "distribution", value.name = "posterior")
-rlms_conformity_novelty[, survey := "А. РМЭЗ"]
+rlms_conformity_novelty[, survey := "А. РМЭЗ (полн)"]
 
 vodpf_conformity_novelty <- vodpf_household_income_conformity_by_novelty[type == "posterior", -c("type", "uniform", "benford", "stigler", "contaminated_benford", "rodriguez", "hurlimann")]
 vodpf_conformity_novelty <- melt(vodpf_conformity_novelty, id.vars = c("year", "new"), variable.name = "distribution", value.name = "posterior")
@@ -309,6 +316,10 @@ ggsave(yearly_survey_mentions_top_journals_plot, file = "figures/yearly_survey_m
 #############################
 # Figure with results of power simulations
 
+# Remove data for parameter values from 0.15 to 0.5
+# for Contaminated Benford as they are trivial
+benford_power_simulations <- benford_power_simulations[ !( alternative == "Contaminated Benford" & param > 0.15 ) ]
+
 benford_power_simulations[ alternative == "Contaminated Benford", alternative := "А. «Загрязненный» закон Бенфорда"]
 benford_power_simulations[ alternative == "Generalized Benford", alternative := "Б. Обобщенный закон Бенфорда"]
 benford_power_simulations[ alternative == "Rodriguez", alternative := "В. Закон Родригеза"]
@@ -337,17 +348,18 @@ ggsave(benford_power_simulations_plot, file = "figures/benford_power_simulations
 income_surveys_summary_stat <- fread("output/income_surveys_summary_stat.csv")
 
 # Only most recent surveys and waves
-recent_income_surveys_summary_stat <- income_surveys_summary_stat[ (survey %in% c("VNDN", "VODPF", "RLMS", "SIPP") & year == 2022) | (survey == "RCVS" & year == 2021) | (survey == "FINMON" & year == 2018) | (survey == "EUSILC" & year == 2013)]
+recent_income_surveys_summary_stat <- income_surveys_summary_stat[ (survey %in% c("VNDN", "VODPF", "RLMS", "RLMSrepr", "SIPP") & year == 2022) | (survey == "RCVS" & year == 2021) | (survey == "FINMON" & year == 2018) | (survey == "EUSILC" & year == 2013)]
 recent_income_surveys_summary_stat[ level == "household", level := "Дом-ва"]
 recent_income_surveys_summary_stat[ level == "individual", level := "Инд."]
 
 recent_income_surveys_summary_stat[ survey == "VNDN", survey := "ВНДН"]
 recent_income_surveys_summary_stat[ survey == "VODPF", survey := "ВОДПФ"]
-recent_income_surveys_summary_stat[ survey == "RLMS", survey := "РМЭЗ"]
+recent_income_surveys_summary_stat[ survey == "RLMS", survey := "РМЭЗ (полн)"]
+recent_income_surveys_summary_stat[ survey == "RLMSrepr", survey := "РМЭЗ (репр)"]
 recent_income_surveys_summary_stat[ survey == "FINMON", survey := "ФИНМОН"]
 
 # Custom order
-recent_income_surveys_summary_stat <- recent_income_surveys_summary_stat[c(3, 4, 1, 2, 7, 8, 10, 9, 5, 6, 11, 12)]
+recent_income_surveys_summary_stat <- recent_income_surveys_summary_stat[c(3, 4, 1, 2, 9, 10, 7, 8, 12, 11, 5, 6, 13, 14)]
 fwrite(recent_income_surveys_summary_stat, file = "tables/recent_income_surveys_summary_stat.csv")
 
 #############################
@@ -394,7 +406,6 @@ mean(rlms_household_income_conformity_by_area_id_year[area_id == 117 & type == "
 # In-text statement for Липецк
 mean(rlms_household_income_conformity_by_area_id_year[area_id == 72 & type == "posterior" & year < 2010]$generalized_benford)
 
-
 #############################
 # Figure with RLMS share of SSU observations conforming with Benford's law
 
@@ -415,3 +426,10 @@ rlms_ssu_share_plot <- ggplot(aes(x = year, y = share_conforming), data = rlms_h
 	theme(text = element_text(size = 12), legend.position = "bottom", legend.title = element_blank(), panel.grid.minor = element_blank(), panel.grid.major = element_blank())
 
 ggsave(rlms_ssu_share_plot, file = "figures/rlms_ssu_share_plot.pdf", width = 710, height = 430, scale = 3, device = cairo_pdf, units = "px")
+
+#############################
+# Table with structural characteristics of RLMS waves
+
+# Custom order
+setcolorder(rlms_per_wave_characteristics, c("year", "ssus", "ssus_benford", "households", "households_benford", "new_households", "iqr_interview_span", "median_interview_duration", "sd_realincome"))
+fwrite(rlms_per_wave_characteristics, file = "tables/rlms_per_wave_characteristics.csv")

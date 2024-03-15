@@ -5,6 +5,8 @@ VNDN,2022,household,posterior,0,0,0,0,0,0,0
 VNDN,2022,individual,posterior,0,0,0,0,0,0,0
 SIPP,2022,household,posterior,0,0,0,0,0,0,0
 SIPP,2022,individual,posterior,0,0,0,0,0,0,0
+RLMSrepr,2022,household,posterior,0,0.0081,0,0,0.1642,0.0098,0
+RLMSrepr,2022,individual,posterior,0,0,0,0,0,0,0
 RLMS,2022,household,posterior,0,0,0,0,0,0,0
 RLMS,2022,individual,posterior,0,0,0,0,0,0,0
 RCVS,2021,household,posterior,0,0,0,0,0,0,0
@@ -17,6 +19,8 @@ VNDN,2022,household,pvalue,0,0,0,0,0,0,0
 VNDN,2022,individual,pvalue,0,0,0,0,0,0,0
 SIPP,2022,household,pvalue,0,0,0,0,0,0,0
 SIPP,2022,individual,pvalue,0,0,0,0,0,0,0
+RLMSrepr,2022,household,pvalue,0,0,0,0,0,0,0
+RLMSrepr,2022,individual,pvalue,0,0,0,0,0,0,0
 RLMS,2022,household,pvalue,0,0,0,0,0,0,0
 RLMS,2022,individual,pvalue,0,0,0,0,0,0,0
 RCVS,2021,household,pvalue,0,0,0,0,0,0,0

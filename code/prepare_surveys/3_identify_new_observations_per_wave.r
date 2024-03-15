@@ -4,6 +4,7 @@ library(stringi)
 library(stringr)
 library(labelled)
 
+
 # Declare working directory beforehand in an environment variable
 # BENFORD_RUSSIAN_INCOME_SURVEYS_PATH = "path_to_your_folder"
 # with the aid of usethis::edit_r_environ()
@@ -102,7 +103,7 @@ rlms_individual_first_year[, level := "individual"]
 ############################
 # For other surveys with recurring identifiers we simply take the min year
 
-income_surveys_first_year <- income_surveys[ survey %in% c( "VODPF"), list(first_year = min(year)), by = c("survey", "level", "id")] 
+income_surveys_first_year <- income_surveys[ survey %in% c("VODPF"), list(first_year = min(year)), by = c("survey", "level", "id")] 
 
 # Attach RLMS and save in one object
 income_surveys_first_year <- rbind(income_surveys_first_year, rlms_household_first_year, fill = T)

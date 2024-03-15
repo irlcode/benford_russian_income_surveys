@@ -2,6 +2,7 @@ library(data.table)
 library(foreign)
 library(stringi)
 library(stringr)
+library(lubridate)
 library(labelled)
 
 # Declare working directory beforehand in an environment variable
@@ -12,7 +13,7 @@ path <- Sys.getenv("BENFORD_RUSSIAN_INCOME_SURVEYS_PATH")
 setwd(paste0(path, "/survey_data"))
 
 ############################
-# RLMS, 1994-2021 combined
+# RLMS, 1994-2022 combined
 
 ##########
 # Household-level
@@ -28,21 +29,41 @@ load("rlms/rlms_household.rdata")
 # 99999999 NO ANSWER
 # F14 TOTAL INCOME IN LAST 30 DAYS
 # F2 How much money does your family need per month, in order to live normally? rubles. 
+# A4.1 Interview day
+# A4.2 Interview month
+# A5.1 Interview length, hours
+# A5.2 Interview length, minutes
 # No interviewer IDs
 
-rlms_household <- rlms_household[, c("id_w", "id_h", "site", "g5", "f14", "f2"), with = F]
+rlms_household <- rlms_household[, c("id_w", "id_h", "site", "representative", "g5", "f14", "f2", "a4.1", "a4.2", "a5.1", "a5.2"), with = F]
+
+# Refusals and don't knows to NAs
+rlms_household[, names(rlms_household) := lapply(.SD, function(x) ifelse(x %in% c("99999996", "99999997", "99999998", "99999999"), NA, x)) ]
 
 # Year variable
 rlms_household[, year := as.numeric(as.character(id_w))]
+
+# Interview date
+# Fix one erronerous non-leap year
+rlms_household[ year %in% c(2010, 2011) & a4.1 == 29 & a4.2 == 2, a4.1 := 28] 
+
+rlms_household[, interview_date := dmy(paste0(a4.1, "-", a4.2, "-", year))]
+
+# Interview duration (minutes)
+rlms_household[, interview_duration := a5.1*60 + a5.2 ]
 
 # Proper names and order
 rlms_household[, survey := "RLMS"]
 rlms_household[, level := "household"]
 setnames(rlms_household, c("id_h", "site", "g5", "f14", "f2"), c("id", "area_id", "confidence", "income", "amount_living_normally"))
-rlms_household <- rlms_household[, c("survey", "level", "year", "id", "area_id", "confidence", "income", "amount_living_normally"), with = F]
 
-# Refusals and don't knows to NAs
-rlms_household[, names(rlms_household) := lapply(.SD, function(x) ifelse(x %in% c("99999996", "99999997", "99999998", "99999999"), NA, x)) ]
+# Separate subset with only representative observations
+rlms_household_representative <- rlms_household[representative == 1, c("survey", "level", "year", "id", "area_id", "confidence", "income", "amount_living_normally", "interview_date", "interview_duration"), with = F]
+rlms_household_representative[, survey := "RLMSrepr" ]
+
+rlms_household <- rlms_household[, c("survey", "level", "year", "id", "area_id", "confidence", "income", "amount_living_normally", "interview_date", "interview_duration"), with = F]
+rlms_household_representative <- rlms_household_representative[, c("survey", "level", "year", "id", "area_id", "confidence", "income", "amount_living_normally", "interview_date", "interview_duration"), with = F]
+
 gc()
 
 ##########
@@ -56,11 +77,18 @@ gc()
 # J69.8A — MONEY TO LIVE NORMALLY
 # J69.8B — MONEY TO LIVE WELL
 # J69.8C MONEY TO LIVE POORLY
+# H7.1 Interview day
+# H7.2 Interview month
+# H8a Interview length, hours
+# H8b Interview length, minutes
 # No interviewer IDs
 
 load("rlms/rlms_individual.rdata")
 
-rlms_individual <- rlms_individual[, c("id_w", "idind", "site", "s5", "j60", "j69.8a", "j69.8b", "j69.8c"), with = F]
+rlms_individual <- rlms_individual[, c("id_w", "idind", "site", "representative", "s5", "j60", "j69.8a", "j69.8b", "j69.8c", "h7.1", "h7.2", "h8a", "h8b"), with = F]
+
+# Refusals and don't knows to NAs
+rlms_individual[, names(rlms_individual) := lapply(.SD, function(x) ifelse(x %in% c("99999996", "99999997", "99999998", "99999999"), NA, x)) ]
 
 # Year variable
 rlms_individual[, year := as.numeric(as.character(id_w))]
@@ -68,14 +96,26 @@ rlms_individual[, year := as.numeric(as.character(id_w))]
 # Confidence variable
 rlms_individual[, confidence := s5]
 
+# Interview date
+# Fix one erronerous non-leap year
+rlms_individual[ year %in% c(2010, 2011) & h7.1 == 29 & h7.2 == 2, h7.1 := 28] 
+
+rlms_individual[, interview_date := dmy(paste0(h7.1, "-", h7.2, "-", year))]
+
+# Interview duration (minutes)
+rlms_individual[, interview_duration := h8a*60 + h8b ]
+
 # Proper names and order
 rlms_individual[, survey := "RLMS"]
 rlms_individual[, level := "individual"]
 setnames(rlms_individual, c("idind", "site", "j60", "j69.8a", "j69.8b", "j69.8c"), c("id", "area_id", "income", "amount_living_normally", "amount_living_well", "amount_living_poorly"))
-rlms_individual <- rlms_individual[, c("survey", "level", "year", "id", "area_id", "confidence", "income", "amount_living_normally", "amount_living_well", "amount_living_poorly"), with = F]
 
-# Refusals and don't knows to NAs
-rlms_individual[, names(rlms_individual) := lapply(.SD, function(x) ifelse(x %in% c("99999996", "99999997", "99999998", "99999999"), NA, x)) ]
+# Separate subset with only representative observations
+rlms_individual_representative <- rlms_individual[representative == 1, c("survey", "level", "year", "id", "area_id", "confidence", "income", "amount_living_normally", "amount_living_well", "amount_living_poorly", "interview_date", "interview_duration"), with = F]
+rlms_individual_representative[, survey := "RLMSrepr" ]
+
+rlms_individual <- rlms_individual[, c("survey", "level", "year", "id", "area_id", "confidence", "income", "amount_living_normally", "amount_living_well", "amount_living_poorly", "interview_date", "interview_duration"), with = F]
+
 gc()
 
 ############################
@@ -1568,7 +1608,7 @@ eusilc_individual <- eusilc_individual[, c("survey", "level", "year", "id", "are
 ############################
 # All surveys to one object
 
-income_surveys <- rbindlist(list(rlms_household, rlms_individual, vndn_2012_household, vndn_2012_individual, vndn_2014_household, vndn_2014_individual, vndn_2015_household, vndn_2015_individual, vndn_2016_household, vndn_2016_individual, vndn_2017_household, vndn_2017_individual, vndn_2018_household, vndn_2018_individual, vndn_2019_household, vndn_2019_individual, vndn_2020_household, vndn_2020_individual, vndn_2021_household, vndn_2021_individual, vndn_2022_household, vndn_2022_individual, cbr_survey_waves_1_5_household, cbr_survey_waves_1_5_individual, finmon_2011_household, finmon_2012_household, finmon_2013_household, finmon_2014_household, finmon_2015_household, finmon_2016_household, finmon_2017_household, finmon_2018_household, rcvs_2021_household, sipp_2022_household, sipp_2022_individual, eusilc_household, eusilc_individual), fill = T)
+income_surveys <- rbindlist(list(rlms_household, rlms_household_representative, rlms_individual, rlms_individual_representative, vndn_2012_household, vndn_2012_individual, vndn_2014_household, vndn_2014_individual, vndn_2015_household, vndn_2015_individual, vndn_2016_household, vndn_2016_individual, vndn_2017_household, vndn_2017_individual, vndn_2018_household, vndn_2018_individual, vndn_2019_household, vndn_2019_individual, vndn_2020_household, vndn_2020_individual, vndn_2021_household, vndn_2021_individual, vndn_2022_household, vndn_2022_individual, cbr_survey_waves_1_5_household, cbr_survey_waves_1_5_individual, finmon_2011_household, finmon_2012_household, finmon_2013_household, finmon_2014_household, finmon_2015_household, finmon_2016_household, finmon_2017_household, finmon_2018_household, rcvs_2021_household, sipp_2022_household, sipp_2022_individual, eusilc_household, eusilc_individual), fill = T)
 
 # Coerce to numeric
 income_surveys[, income := gsub(",", ".", income, fixed = T)]
