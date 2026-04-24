@@ -16,7 +16,7 @@ setwd(paste0(path, "/survey_data"))
 load("income_surveys.rdata")
 
 ############################
-# RLMS, 1994-2022 combined
+# RLMS, 1994-2023 combined
 
 ##########
 # Household-level
@@ -52,6 +52,7 @@ rlms_household[ !is.na(xid_h) & is.na(first_year), first_year := 2019 ]
 rlms_household[ !is.na(yid_h) & is.na(first_year), first_year := 2020 ]
 rlms_household[ !is.na(zid_h) & is.na(first_year), first_year := 2021 ]
 rlms_household[ !is.na(aaid_h) & is.na(first_year), first_year := 2022 ]
+rlms_household[ !is.na(bbid_h) & is.na(first_year), first_year := 2023 ]
 
 # NB: id_h is not unique across waves, so we need to carry year variable as well
 rlms_household_first_year <- rlms_household[, c("id_h", "id_w", "first_year"), with = F]
@@ -94,7 +95,8 @@ rlms_individual[ !is.na(xid_h) & is.na(first_year), first_year := 2019 ]
 rlms_individual[ !is.na(yid_h) & is.na(first_year), first_year := 2020 ]
 rlms_individual[ !is.na(zid_h) & is.na(first_year), first_year := 2021 ]
 rlms_individual[ !is.na(aaid_h) & is.na(first_year), first_year := 2022 ]
- 
+rlms_individual[ !is.na(bbid_h) & is.na(first_year), first_year := 2023 ]
+
 rlms_individual_first_year <- unique(rlms_individual[, c("idind", "first_year"), with = F], by = "idind")
 setnames(rlms_individual_first_year, c("idind"), c("id"))
 rlms_individual_first_year[, survey := "RLMS"]

@@ -15,7 +15,7 @@ setwd(paste0(path, "/survey_data/rlms"))
 # Household-level, full sample
 
 # List all RLMS household-level .sav files 
-survey_files <- list.files("Полная выборка_волны 5-31_01.09.2023", pattern = ".sav", recursive = T)
+survey_files <- list.files("Полная выборка_волны 5-32_31.08.2024", pattern = ".sav", recursive = T)
 survey_files <- survey_files[ grepl("домох", survey_files, ignore.case = T)]
 
 # Init an empty object
@@ -23,10 +23,10 @@ rlms_household <- data.table()
 
 for(f in survey_files) {
 	
-		# Debug: f <- survey_files[22]
+		# Debug: f <- survey_files[23]
 		message(f)
 
-		surveypath <- paste0(getwd(), "/Полная выборка_волны 5-31_01.09.2023/", f)
+		surveypath <- paste0(getwd(), "/Полная выборка_волны 5-32_31.08.2024/", f)
 
 		# Import data
 		temp <- as.data.table(read_sav(surveypath, encoding = "cp1251"))
@@ -36,6 +36,7 @@ for(f in survey_files) {
 		# ID_W — wave ID
 		# ID_H — HOUSEHOLD ID (unique within round)
 		# SITE — survey area ID (unique within round)
+		# HHGWT — household post-stratification weight
 		# G5 — ASSESS THE RESPONDENTS SHARPNESS
 		# F14 TOTAL INCOME IN LAST 30 DAYS
 		# F2 How much money does your family need per month, in order to live normally? rubles. 
@@ -47,12 +48,12 @@ for(f in survey_files) {
 
 		# Variables of interest
 		varnames <- names(temp)
-		varnames_interest <- varnames[ grepl("(^[A-z]{1,2}id_h)|site|(f14$)|(g5$)|(f2$)|(a4.1$)|(a4.2$)|(a5.1$)|(a5.2$)", varnames, ignore.case = T)] 
+		varnames_interest <- varnames[ grepl("(^[A-z]{1,2}id_h)|wgt|site|(f14$)|(g5$)|(f2$)|(a4.1$)|(a4.2$)|(a5.1$)|(a5.2$)", varnames, ignore.case = T)] 
 		#varnames_interest <- varnames_interest[order(varnames_interest)]
 		temp <- temp[, c(varnames_interest), with = F]
 		
 		# Rename variables to uniform
-		varnames_new <- str_extract(varnames_interest, "f14|g5|f2|a4.1|a4.2|a5.1|a5.2")
+		varnames_new <- str_extract(varnames_interest, "wgt|f14|g5|f2|a4.1|a4.2|a5.1|a5.2")
 		varnames_interest <- varnames_interest[!is.na(varnames_new)]
 		varnames_new <- varnames_new[!is.na(varnames_new)]
 		setnames(temp, varnames_interest, varnames_new)
@@ -90,7 +91,8 @@ for(f in survey_files) {
 		temp[ wave_letter == "yi", id_w := 2020 ]
 		temp[ wave_letter == "zi", id_w := 2021 ]
 		temp[ wave_letter == "aa", id_w := 2022 ]
-		
+		temp[ wave_letter == "bb", id_w := 2023 ]
+
 		# Proper format
 		if( any(grepl("f14", varnames_new, ignore.case = T)) ) {
 			
@@ -112,7 +114,7 @@ for(f in survey_files) {
 }
 
 # Read in representative RLMS sample as well 
-survey_files_representative <- list.files("Репрезентативная выборка_волны 5-31_26.11.2023", pattern = ".sav", recursive = T)
+survey_files_representative <- list.files("Репрезентативная выборка_волны 5-31_31.08.2024", pattern = ".sav", recursive = T)
 survey_files_representative <- survey_files_representative[ grepl("домох", survey_files_representative, ignore.case = T)]
 
 # Init an empty object
@@ -123,7 +125,7 @@ for(f in survey_files_representative) {
 		# Debug: f <- survey_files_representative[22]
 		message(f)
 
-		surveypath <- paste0(getwd(), "/Репрезентативная выборка_волны 5-31_26.11.2023/", f)
+		surveypath <- paste0(getwd(), "/Репрезентативная выборка_волны 5-31_31.08.2024/", f)
 
 		# Import data
 		temp <- as.data.table(read_sav(surveypath, encoding = "cp1251"))
@@ -166,7 +168,8 @@ for(f in survey_files_representative) {
 		temp[ wave_letter == "yi", id_w := 2020 ]
 		temp[ wave_letter == "zi", id_w := 2021 ]
 		temp[ wave_letter == "aa", id_w := 2022 ]
-		
+		temp[ wave_letter == "bb", id_w := 2023 ]
+
 		# Remove all attributes
 		temp <- remove_attributes(temp, attributes = c("label", "format.spss", "display_width", "labels"))
 		temp <- temp[, c("id_h", "id_w") ]
@@ -181,7 +184,7 @@ rlms_household <- merge(rlms_household, rlms_household_representative, by = c("i
 rlms_household[is.na(representative), representative := 0]
 
 # Proper order
-setcolorder(rlms_household, c("id_h", "id_w", "site", "representative", "f14", "f2", "g5", "a4.1", "a4.2", "a5.1", "a5.2"))
+setcolorder(rlms_household, c("id_h", "id_w", "site", "wgt", "representative", "f14", "f2", "g5", "a4.1", "a4.2", "a5.1", "a5.2"))
 setkeyv(rlms_household, c("id_w", "id_h"))
 
 save(rlms_household, file = "rlms_household.rdata", compress = "gzip")
@@ -190,7 +193,7 @@ save(rlms_household, file = "rlms_household.rdata", compress = "gzip")
 # Individual-level, full sample
 
 # List all RLMS individual-level .sav files 
-survey_files <- list.files("Полная выборка_волны 5-31_01.09.2023", pattern = ".sav", recursive = T)
+survey_files <- list.files("Полная выборка_волны 5-32_31.08.2024", pattern = ".sav", recursive = T)
 survey_files <- survey_files[ grepl("индив", survey_files, ignore.case = T)]
 
 # Init an empty object
@@ -201,7 +204,7 @@ for(f in survey_files) {
 		# Debug: f <- survey_files[22]
 		message(f)
 
-		surveypath <- paste0(getwd(), "/Полная выборка_волны 5-31_01.09.2023/", f)
+		surveypath <- paste0(getwd(), "/Полная выборка_волны 5-32_31.08.2024/", f)
 
 		# Import data
 		temp <- as.data.table(read_sav(surveypath, encoding = "cp1251"))
@@ -210,6 +213,7 @@ for(f in survey_files) {
 		# id_w — wave ID
 		# idind — PERSON ID (same across rounds)
 		# id_h — HOUSEHOLD ID (unique within round)
+		# inwgt – individual post-stratification weight
 		# S5 — ASSESS THE RESPONDENTS SHARPNESS: 1 VERY SLOW-WITTED, 2 SLOW-WITTED, NEEDED ADDITIONAL EXPLANATIONS, 3 AS BRIGHT AS THE MAJORITY OF RESPONDENTS, 4 NOTABLY BRIGHTER THAN THE MAJORITY OF RESPONDENTS
 		# J60 TOTAL INCOME IN LAST 30 DAYS
 		# J69.8A — MONEY TO LIVE NORMALLY
@@ -222,12 +226,12 @@ for(f in survey_files) {
 
 		# Variables of interest
 		varnames <- names(temp)
-		varnames_interest <- varnames[ grepl("(^[A-z]{1,2}id_h)|(^idind$)|site|(s5$)|(j60$)|(j69.8a$)|(j69.8b$)|(j69.8c$)|(h7.1$)|(h7.2$)|(h8a$)|(h8b$)", varnames, ignore.case = T)] 
+		varnames_interest <- varnames[ grepl("(^[A-z]{1,2}id_h)|(^idind$)|wgt|site|(s5$)|(j60$)|(j69.8a$)|(j69.8b$)|(j69.8c$)|(h7.1$)|(h7.2$)|(h8a$)|(h8b$)", varnames, ignore.case = T)] 
 		#varnames_interest <- varnames_interest[order(varnames_interest)]
 		temp <- temp[, c(varnames_interest), with = F]
 		
 		# Rename variables to uniform
-		varnames_new <- str_extract(varnames_interest, "j60|s5|j69.8a|j69.8b|j69.8c|h7.1|h7.2|h8a|h8b")
+		varnames_new <- str_extract(varnames_interest, "wgt|j60|s5|j69.8a|j69.8b|j69.8c|h7.1|h7.2|h8a|h8b")
 		varnames_interest <- varnames_interest[!is.na(varnames_new)]
 		varnames_new <- varnames_new[!is.na(varnames_new)]
 		setnames(temp, varnames_interest, varnames_new)
@@ -265,7 +269,8 @@ for(f in survey_files) {
 		temp[ wave_letter == "yi", id_w := 2020 ]
 		temp[ wave_letter == "zi", id_w := 2021 ]
 		temp[ wave_letter == "aa", id_w := 2022 ]
-		
+		temp[ wave_letter == "bb", id_w := 2023 ]
+
 		# Proper format
 		if( any(grepl("j60", varnames_new, ignore.case = T)) ) {
 			
@@ -330,7 +335,7 @@ for(f in survey_files) {
 }
 
 # Read in representative RLMS sample as well 
-survey_files_representative <- list.files("Репрезентативная выборка_волны 5-31_26.11.2023", pattern = ".sav", recursive = T)
+survey_files_representative <- list.files("Репрезентативная выборка_волны 5-31_31.08.2024", pattern = ".sav", recursive = T)
 survey_files_representative <- survey_files_representative[ grepl("индив", survey_files_representative, ignore.case = T)]
 
 # Init an empty object
@@ -341,7 +346,7 @@ for(f in survey_files_representative) {
 		# Debug: f <- survey_files_representative[22]
 		message(f)
 
-		surveypath <- paste0(getwd(), "/Репрезентативная выборка_волны 5-31_26.11.2023/", f)
+		surveypath <- paste0(getwd(), "/Репрезентативная выборка_волны 5-31_31.08.2024/", f)
 
 		# Import data
 		temp <- as.data.table(read_sav(surveypath, encoding = "cp1251"))
@@ -384,7 +389,8 @@ for(f in survey_files_representative) {
 		temp[ wave_letter == "yi", id_w := 2020 ]
 		temp[ wave_letter == "zi", id_w := 2021 ]
 		temp[ wave_letter == "aa", id_w := 2022 ]
-		
+		temp[ wave_letter == "bb", id_w := 2023 ]
+
 		# Remove all attributes
 		temp <- remove_attributes(temp, attributes = c("label", "format.spss", "display_width", "labels"))
 		temp <- temp[, c("id_h", "id_w", "idind") ]
@@ -399,7 +405,7 @@ rlms_individual <- merge(rlms_individual, rlms_individual_representative, by = c
 rlms_individual[is.na(representative), representative := 0]
 
 # Proper order
-setcolorder(rlms_individual, c("idind", "id_h", "id_w", "site", "representative", "j60", "j69.8a", "j69.8b", "j69.8c", "s5", "h7.1", "h7.2", "h8a", "h8b"))
+setcolorder(rlms_individual, c("idind", "id_h", "id_w", "wgt", "site", "representative", "j60", "j69.8a", "j69.8b", "j69.8c", "s5", "h7.1", "h7.2", "h8a", "h8b"))
 setkeyv(rlms_individual, c("idind", "id_w", "id_h"))
 
 save(rlms_individual, file = "rlms_individual.rdata", compress = "gzip")
